@@ -43,6 +43,14 @@ export const ensureIndexes = async () => {
     chunks.createIndex({ documentId: 1 }, { background: true }),
     chunks.createIndex({ sourceFilename: 1 }, { background: true }),
     chunks.createIndex({ chunkIndex: 1 }, { background: true }),
+    chunks.createIndex({ embedding: 'vector' }, { 
+      vectorOptions: {
+        type: 'float32',
+        dimensions: 3072, // For text-embedding-3-large
+        similarity: 'cosine'
+      },
+      background: true
+    }),
   ]);
 
   logger.info('MongoDB indexes ensured');

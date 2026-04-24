@@ -60,7 +60,12 @@ export const persistChunks = async (chunkRecords) => {
 
   const db = getDb();
   const collection = db.collection(CHUNK_COLLECTION);
-  await collection.insertMany(chunkRecords, { ordered: true });
+  const result = await collection.insertMany(chunkRecords, { ordered: false });
+  
+  if (result.insertedCount !== chunkRecords.length) {
+    throw new Error(`Failed to insert all chunks: ${result.insertedCount}/${chunkRecords.length} inserted`);
+  }
+  
   return chunkRecords;
 };
 

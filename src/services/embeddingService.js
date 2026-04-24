@@ -12,8 +12,8 @@ const retryRequest = async (fn, attempts = 3) => {
       return await fn();
     } catch (error) {
       lastError = error;
-      const backoff = 500 * attempt;
-      logger.warn({ attempt, message: error.message }, 'Embedding request failed, retrying');
+      const backoff = 1000 * (2 ** (attempt - 1)); // Exponential backoff: 1s, 2s, 4s
+      logger.warn({ attempt, message: error.message, backoff }, 'Embedding request failed, retrying');
       await delay(backoff);
     }
   }
@@ -27,10 +27,14 @@ export const embedChunks = async (chunks) => {
 
   const batchSize = Math.max(1, config.embeddingBatchSize);
   const embeddingResults = [];
+  const totalBatches = Math.ceil(chunks.length / batchSize);
 
-  for (let offset = 0; offset < chunks.length; offset += batchSize) {
+  for (let batchIndex = 0; batchIndex < totalBatches; batchIndex++) {
+    const offset = batchIndex * batchSize;
     const batch = chunks.slice(offset, offset + batchSize);
     const inputs = batch.map((chunk) => chunk.text);
+
+    logger.debug({ batchIndex: batchIndex + 1, totalBatches, batchSize: batch.length }, 'Processing embedding batch');
 
     const response = await retryRequest(() =>
       client.embeddings.create({
@@ -60,6 +64,8 @@ export const embedChunks = async (chunks) => {
   if (inconsistent) {
     throw new Error('Embedding dimension mismatch detected across chunks');
   }
+
+  logger.info({ totalChunks: chunks.length, embeddingDimension: expectedDim }, 'Embeddings generated successfully');
 
   return embeddingResults;
 };

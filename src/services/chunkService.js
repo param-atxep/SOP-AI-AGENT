@@ -22,29 +22,51 @@ const buildChunk = ({ text, documentId, chunkIndex, sourceFilename }) => ({
 export const buildChunks = ({ text, documentId, sourceFilename }) => {
   const sentences = splitSentences(text);
   const chunks = [];
-  let current = '';
+  let currentSentences = [];
+  let currentLength = 0;
   let chunkIndex = 0;
 
   for (const sentence of sentences) {
-    const nextCandidate = current ? `${current} ${sentence}` : sentence;
+    const sentenceLength = sentence.length + 1; // +1 for space
 
-    if (nextCandidate.length > CHUNK_MAX_LENGTH && current.length >= MIN_CHUNK_LENGTH) {
-      chunks.push(buildChunk({ text: current, documentId, chunkIndex, sourceFilename }));
+    if (currentLength + sentenceLength > CHUNK_MAX_LENGTH && currentLength >= MIN_CHUNK_LENGTH) {
+      // Push current chunk
+      const chunkText = currentSentences.join(' ');
+      chunks.push(buildChunk({ text: chunkText, documentId, chunkIndex, sourceFilename }));
       chunkIndex += 1;
-      const overlap = current.slice(-CHUNK_OVERLAP).trim();
-      current = overlap ? `${overlap} ${sentence}` : sentence;
-      continue;
+
+      // Calculate overlap sentences
+      let overlapSentences = [];
+      let overlapLength = 0;
+      for (let i = currentSentences.length - 1; i >= 0; i--) {
+        if (overlapLength >= CHUNK_OVERLAP) break;
+        const s = currentSentences[i];
+        if (overlapLength + s.length + 1 <= CHUNK_OVERLAP) {
+          overlapSentences.unshift(s);
+          overlapLength += s.length + 1;
+        } else {
+          break;
+        }
+      }
+
+      currentSentences = overlapSentences;
+      currentLength = overlapLength;
     }
 
-    current = nextCandidate;
+    // Add the new sentence
+    currentSentences.push(sentence);
+    currentLength += sentenceLength;
   }
 
-  if (current.trim().length > 0) {
-    chunks.push(buildChunk({ text: current, documentId, chunkIndex, sourceFilename }));
+  // Add remaining
+  if (currentSentences.length > 0) {
+    const chunkText = currentSentences.join(' ');
+    chunks.push(buildChunk({ text: chunkText, documentId, chunkIndex, sourceFilename }));
   }
 
+  // Fallback if no chunks and text exists
   if (chunks.length === 0 && text.trim().length > 0) {
-    chunks.push(buildChunk({ text: text.trim(), documentId, chunkIndex, sourceFilename }));
+    chunks.push(buildChunk({ text: text.trim(), documentId, chunkIndex: 0, sourceFilename }));
   }
 
   return chunks;

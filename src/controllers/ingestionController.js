@@ -1,9 +1,17 @@
 import { processUploadedFiles, getDocumentById, getChunksByDocumentId } from '../services/ingestService.js';
+import { isPdfFile } from '../utils/validation.js';
 
 export const uploadDocuments = async (req, res, next) => {
   try {
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ success: false, error: 'No PDF files were provided' });
+    }
+
+    // Validate each file
+    for (const file of req.files) {
+      if (!isPdfFile(file.originalname, file.mimetype)) {
+        return res.status(400).json({ success: false, error: `Invalid file: ${file.originalname} is not a PDF` });
+      }
     }
 
     const results = await processUploadedFiles(req.files);

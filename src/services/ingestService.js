@@ -24,7 +24,6 @@ const processSingleFile = async (file) => {
   const existing = await storageService.findDocumentByHash(contentHash);
 
   if (existing) {
-    await removeFile(filePath);
     return {
       filename,
       status: 'duplicate',
@@ -74,29 +73,28 @@ const processSingleFile = async (file) => {
   } catch (error) {
     await storageService.markDocumentFailed(documentId, error.message);
     logger.error({ err: error, filename, documentId }, 'Document ingestion failed');
-    return {
-      filename,
-      status: 'failed',
-      documentId,
-      error: error.message,
-    };
+    throw error; // Re-throw to be caught in processUploadedFiles
+  } finally {
+    await removeFile(filePath);
   }
 };
 
 export const processUploadedFiles = async (files) => {
-  const results = [];
-
-  for (const file of files) {
+  const promises = files.map(async (file) => {
     try {
-      const fileResult = await processSingleFile(file);
-      results.push(fileResult);
+      const startTime = Date.now();
+      const result = await processSingleFile(file);
+      const processingTime = Date.now() - startTime;
+      logger.info({ filename: file.originalname, status: result.status, processingTime }, 'File processed');
+      return result;
     } catch (error) {
       logger.error({ err: error, filename: file.originalname }, 'File processing aborted');
-      results.push({ filename: file.originalname, status: 'failed', error: error.message });
+      return { filename: file.originalname, status: 'failed', error: error.message };
     }
-  }
+  });
 
-  return results;
+  const results = await Promise.allSettled(promises);
+  return results.map((r) => (r.status === 'fulfilled' ? r.value : { filename: 'unknown', status: 'failed', error: r.reason.message }));
 };
 
 export const getDocumentById = async (documentId) => storageService.getDocumentById(documentId);

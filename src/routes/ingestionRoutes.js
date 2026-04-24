@@ -18,8 +18,8 @@ const upload = multer({
   storage,
   limits: { fileSize: config.maxFileSizeBytes },
   fileFilter: (req, file, cb) => {
-    if (!file.mimetype || !file.mimetype.includes('pdf')) {
-      return cb(new Error('Only PDF documents are supported')); 
+    if (file.mimetype !== 'application/pdf') {
+      return cb(new Error('Only PDF documents are supported'));
     }
     cb(null, true);
   },
