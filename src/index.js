@@ -1,3 +1,4 @@
+import fs from 'fs/promises';
 import app from './app.js';
 import config from './config/index.js';
 import { connectDb, ensureIndexes } from './db/mongoClient.js';
@@ -5,6 +6,7 @@ import logger from './utils/logger.js';
 
 const startServer = async () => {
   try {
+    await fs.mkdir(config.uploadDir, { recursive: true });
     await connectDb();
     await ensureIndexes();
 
