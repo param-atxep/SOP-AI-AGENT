@@ -374,3 +374,141 @@ This is a **real-world, production-ready AI system architecture** used in modern
 * Contributors
 * 1. Param Shelke
   2. Snehal Satre 
+
+---
+
+###Week 2
+
+
+
+## 📅 WEEK 2: Retrieval Brain (Search Engine)
+
+### 🎯 Goal:
+
+Build a system that takes a user query and returns the most relevant content from stored PDF data.
+
+---
+
+## 🧠 Day 1: Query Input System
+
+**Objective:** Accept user questions
+
+* Create API / UI input field
+* Accept user query (string input)
+* Validate input (non-empty)
+
+✅ **Output:**
+User can type → `"What is refund policy?"`
+
+---
+
+## 🔢 Day 2: Convert Query → Embedding
+
+**Objective:** Make query understandable for AI
+
+* Use embedding model (same as Week 1)
+* Convert query text → vector
+
+```js
+const queryEmbedding = embed("What is refund policy?");
+```
+
+✅ **Output:**
+Query converted into numerical vector
+
+---
+
+## 🔍 Day 3: Vector Search Implementation
+
+**Objective:** Find similar chunks
+
+* Compare query vector with stored vectors
+* Use similarity methods:
+
+  * Cosine similarity (recommended)
+* Retrieve top K results (e.g., top 3)
+
+```js
+results = vectorDB.search(queryEmbedding, top_k=3);
+```
+
+✅ **Output:**
+Top relevant chunks retrieved from DB
+
+---
+
+## 📊 Day 4: Ranking & Filtering
+
+**Objective:** Improve accuracy
+
+* Sort results by similarity score
+* Remove low-confidence matches
+* Keep only high-quality results
+
+✅ **Output:**
+Clean, ranked relevant chunks
+
+---
+
+## 📤 Day 5: Response Generation
+
+**Objective:** Show meaningful answer
+
+* Combine retrieved chunks
+* Format response clearly
+* (Optional) Use LLM to summarize
+
+Example:
+
+```
+Refund is allowed within 7 days of purchase.
+```
+
+✅ **Output:**
+Readable and useful answer
+
+---
+
+## 🔗 Day 6: Connect Full Pipeline
+
+**Objective:** End-to-end working system
+
+Flow:
+
+1. User enters question
+2. Convert → embedding
+3. Search DB
+4. Retrieve chunks
+5. Display answer
+
+✅ **Output:**
+Working search system 🎉
+
+---
+
+## 🧪 Day 7: Testing & Optimization
+
+**Objective:** Make system production-ready
+
+* Test with multiple queries
+* Improve:
+
+  * Chunk size tuning
+  * Top_k values
+  * Speed optimization
+* Handle edge cases:
+
+  * No results found
+  * Irrelevant queries
+
+✅ **Output:**
+Stable and optimized system
+
+---
+
+## 🚀 Final Outcome of Week 2
+
+✔ Query → Vector
+✔ Vector → Search
+✔ Search → Relevant Data
+✔ Data → Final Answer
