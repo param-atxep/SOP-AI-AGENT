@@ -12,4 +12,8 @@ export const errorHandler = (err, req, res, next) => {
     success: false,
     error: err.message || 'Internal server error',
   });
+
+
+
+  
 };
