@@ -54,4 +54,20 @@ export const ensureIndexes = async () => {
   ]);
 
   logger.info('MongoDB indexes ensured');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 };
