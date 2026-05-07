@@ -8,6 +8,8 @@ import { embedChunks } from './embeddingService.js';
 import * as storageService from './storageService.js';
 import { AppError } from '../utils/errors.js';
 
+
+
 const removeFile = async (filePath) => {
   try {
     await fs.unlink(filePath);
