@@ -43,6 +43,8 @@ LLM (Gemini / OpenAI)
 
 * MongoDB Atlas (Vector Search)
 
+
+
 ### AI Layer
 
 * Gemini API (Embedding + LLM)
