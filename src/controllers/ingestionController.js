@@ -12,6 +12,7 @@ export const uploadDocuments = async (req, res, next) => {
       if (!isPdfFile(file.originalname, file.mimetype)) {
         return res.status(400).json({ success: false, error: `Invalid file: ${file.originalname} is not a PDF` });
       }
+      
     }
 
     const results = await processUploadedFiles(req.files);
