@@ -7,6 +7,10 @@ export const uploadDocuments = async (req, res, next) => {
       return res.status(400).json({ success: false, error: 'No PDF files were provided' });
     }
 
+
+
+
+    
     
     // Validate each file
     for (const file of req.files) {
