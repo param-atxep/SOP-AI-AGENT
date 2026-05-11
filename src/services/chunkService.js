@@ -8,6 +8,7 @@ const splitSentences = (text) => {
   return matches ? matches.map((sentence) => sentence.trim()) : [text.trim()];
 };
 
+
 const buildChunk = ({ text, documentId, chunkIndex, sourceFilename }) => ({
   documentId,
   chunkIndex,
