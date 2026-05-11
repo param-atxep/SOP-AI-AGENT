@@ -15,6 +15,10 @@ export const createDocumentPayload = ({ documentId, filename, contentHash, sourc
   uploadedAt: new Date(),
   updatedAt: new Date(),
   metadata: {},
+
+
+
+  
 });
 
 
