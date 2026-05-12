@@ -4,6 +4,9 @@ export class AppError extends Error {
     this.statusCode = statusCode;
     Error.captureStackTrace(this, this.constructor);
   }
+
+
+  
 }
 
 export const createValidationError = (message) => new AppError(message, 400);
