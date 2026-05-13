@@ -21,6 +21,7 @@ const config = {
   uploadMaxFiles: Number(process.env.UPLOAD_MAX_FILES) || 5,
   uploadDir: process.env.UPLOAD_DIR || 'storage/uploads',
   embeddingBatchSize: Number(process.env.EMBEDDING_BATCH_SIZE) || 16,
+  chatModel: process.env.OPENAI_CHAT_MODEL || 'gpt-4o-mini',
   logLevel: process.env.LOG_LEVEL || 'info',
 };
 
