@@ -83,3 +83,39 @@ export const getChunksByDocumentId = async (documentId, limit = 100) => {
     .limit(limit)
     .toArray();
 };
+
+export const performVectorSearch = async (queryVector, { limit = 5, minScore = 0 } = {}) => {
+  const db = getDb();
+  const collection = db.collection(CHUNK_COLLECTION);
+
+  const pipeline = [
+    {
+      $vectorSearch: {
+        index: 'default', // Name of the vector search index
+        path: 'embedding',
+        queryVector,
+        numCandidates: 100, // Higher value increases accuracy but decreases speed
+        limit,
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        documentId: 1,
+        text: 1,
+        chunkIndex: 1,
+        score: { $meta: 'vectorSearchScore' },
+      },
+    },
+  ];
+
+  if (minScore > 0) {
+    pipeline.push({
+      $match: {
+        score: { $gte: minScore },
+      },
+    });
+  }
+
+  return collection.aggregate(pipeline).toArray();
+};

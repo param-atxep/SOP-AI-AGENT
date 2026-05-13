@@ -69,3 +69,24 @@ export const embedChunks = async (chunks) => {
 
   return embeddingResults;
 };
+
+export const embedQuery = async (text) => {
+  if (!text || typeof text !== 'string') {
+    throw new Error('Invalid query text provided for embedding');
+  }
+
+  logger.debug({ textLength: text.length }, 'Generating embedding for query');
+
+  const response = await retryRequest(() =>
+    client.embeddings.create({
+      model: config.embeddingModel,
+      input: text,
+    })
+  );
+
+  if (!response || !response.data || !response.data[0] || !response.data[0].embedding) {
+    throw new Error('OpenAI query embedding response was malformed');
+  }
+
+  return response.data[0].embedding;
+};
